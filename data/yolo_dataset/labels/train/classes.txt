@@ -1,0 +1,71 @@
+# process_for_ocr_enhanced.py
+import cv2
+import os
+import numpy as np
+
+INPUT_DIR = "paper_crops"
+OUTPUT_DIR = "paper_preprocessed"
+
+os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+for filename in os.listdir(INPUT_DIR):
+    if not filename.lower().endswith((".jpg", ".jpeg", ".png")):
+        continue
+
+    path = os.path.join(INPUT_DIR, filename)
+    img = cv2.imread(path)
+
+    if img is None:
+        continue
+
+    # 1. Redimensionner si trop grand (améliore la précision OCR)
+    height, width = img.shape[:2]
+    if width > 800 or height > 800:
+        scale = 800 / max(width, height)
+        new_width = int(width * scale)
+        new_height = int(height * scale)
+        img = cv2.resize(img, (new_width, new_height))
+
+    # 2. Grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+    # 3. Seuillage adaptatif (TRÈS important pour séparer texte/fond)
+    # Testez les deux méthodes et gardez la meilleure
+    thresh = cv2.adaptiveThreshold(
+        gray,
+        255,
+        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv2.THRESH_BINARY_INV,
+        11,  # Taille du voisinage (impair)
+        2    # Constante à soustraire
+    )
+    
+    # Alternative : seuillage Otsu (automatique)
+    # _, thresh = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+    # 4. Détection des contours pour isoler le texte
+    contours, _ = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    
+    # Créer un masque pour le texte
+    mask = np.zeros_like(thresh)
+    for cnt in contours:
+        area = cv2.contourArea(cnt)
+        if area > 20:  # Ignorer les petits points (bruit)
+            cv2.drawContours(mask, [cnt], -1, 255, -1)
+    
+    # 5. Appliquer le masque
+    result = cv2.bitwise_and(thresh, thresh, mask=mask)
+    
+    # 6. Inverser (texte noir sur fond blanc)
+    result = cv2.bitwise_not(result)
+
+    # 7. Améliorer le contraste
+    result = cv2.convertScaleAbs(result, alpha=1.5, beta=0)
+
+    output_path = os.path.join(
+        OUTPUT_DIR,
+        filename.replace(".jpg", "_clean.png").replace(".jpeg", "_clean.png")
+    )
+
+    cv2.imwrite(output_path, result)
+    print(f"✅ Prétraité → {output_path}")
