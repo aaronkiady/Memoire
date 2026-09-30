@@ -1,0 +1,35 @@
+# config.yaml
+ocr:
+  confidence_min: 0.3
+  languages: ['fr']
+  
+formats:
+  standard:
+    description: "Format classique Nom: X | Matricule: Y | Affaire: Z | Site: W"
+    patterns:
+      nom: "Nom:\\s*([A-Z\\s]+)"
+      matricule: "Matricule:\\s*(\\d+)"
+      affaire: "Affaire:\\s*(\\d+[A-Z]*)"
+      site: "Site:\\s*([A-Z0-9\\s/]+)"
+  
+  with_mlle:
+    description: "Format avec Mlle à la place de Matricule"
+    patterns:
+      nom: "Nom:\\s*([A-Z\\s]+)"
+      matricule: "Mlle:\\s*([A-Z0-9]+)"
+      affaire: "Affaire:\\s*(\\d+[A-Z]*)"
+      site: "Site:\\s*([A-Z0-9\\s/]+)"
+  
+  gps_map:
+    description: "Format GPS Map Camera"
+    patterns:
+      nom: "Nom:\\s*([A-Z\\s]+)"
+      matricule: "Mlle:\\s*([A-Z0-9]+)"
+      affaire: "Affaire:\\s*(\\d+[A-Z]*)"
+      site: "Site:\\s*([A-Z0-9\\s/]+)"
+
+sites_connus:
+  - "UNOPS"
+  - "GASYPLAST"
+  - "RN 13"
+  - "RN13"
