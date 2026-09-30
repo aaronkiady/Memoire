@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Historique{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>📚 Historique des imports</h2>
+    
+    {% if uploads %}
+    <table style="width:100%; border-collapse: collapse; margin-top:15px;">
+        <thead>
+            <tr style="border-bottom: 2px solid #e0e0e0;">
+                <th style="text-align:left; padding:10px;">ID</th>
+                <th style="text-align:left; padding:10px;">Fichier</th>
+                <th style="text-align:left; padding:10px;">Date</th>
+                {% if current_user.is_admin() %}
+                <th style="text-align:left; padding:10px;">Utilisateur</th>
+                {% endif %}
+                <th style="text-align:left; padding:10px;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for upload in uploads %}
+            <tr style="border-bottom: 1px solid #f0f0f0;">
+                <td style="padding:10px;">#{{ upload.id }}</td>
+                <td style="padding:10px;">{{ upload.filename }}</td>
+                <td style="padding:10px;">{{ upload.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                {% if current_user.is_admin() %}
+                <td style="padding:10px;">{{ upload.user.username }}</td>
+                {% endif %}
+                <td style="padding:10px;">
+                    <a href="{{ url_for('main.download', history_id=upload.id) }}" class="btn btn-primary" style="padding:5px 10px; font-size:12px;">⬇️ Télécharger</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color: #777; margin-top: 15px;">Aucun historique.</p>
+    {% endif %}
+</div>
+{% endblock %}

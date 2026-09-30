@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Import photos{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <h2>📤 Importer des photos</h2>
+    <p style="color: #777; margin-bottom: 25px;">
+        Sélectionnez les photos contenant les pancartes des employés.
+    </p>
+    
+    <form method="POST" enctype="multipart/form-data">
+        <input type="file" name="images" accept="image/*" multiple required
+               style="width: 100%; padding: 20px; border: 2px dashed #bbb; border-radius: 8px; background: #fafafa; cursor: pointer;">
+        
+        <button type="submit" class="btn btn-success" style="width: 100%; margin-top: 20px; padding: 15px;">
+            🚀 Générer le fichier Excel
+        </button>
+    </form>
+</div>
+{% endblock %}

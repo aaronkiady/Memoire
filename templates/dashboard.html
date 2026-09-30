@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Tableau de bord{% endblock %}
+
+{% block content %}
+<h1 style="color:#1f4e79; margin-bottom:25px;">🏠 Tableau de bord</h1>
+
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px;">
+    <div class="card">
+        <h2>📊 Statistiques</h2>
+        <p style="font-size: 36px; color: #2e75b6; font-weight: bold;">{{ total_uploads }}</p>
+        <p style="color: #777; font-size: 14px;">Imports totaux</p>
+    </div>
+    
+    <div class="card">
+        <h2>📁 Mes imports</h2>
+        <p style="font-size: 36px; color: #28a745; font-weight: bold;">{{ my_uploads }}</p>
+        <p style="color: #777; font-size: 14px;">Fichiers traités</p>
+    </div>
+    
+    {% if current_user.is_admin() %}
+    <div class="card">
+        <h2>⚡ Actions rapides</h2>
+        <a href="{{ url_for('main.upload') }}" class="btn btn-success" style="margin-top:10px;">
+            📤 Nouvel import
+        </a>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>📚 Derniers imports</h2>
+    {% if recent_uploads %}
+    <table style="width:100%; border-collapse: collapse; margin-top:15px;">
+        <thead>
+            <tr style="border-bottom: 2px solid #e0e0e0;">
+                <th style="text-align:left; padding:10px;">Fichier</th>
+                <th style="text-align:left; padding:10px;">Date</th>
+                <th style="text-align:left; padding:10px;">Utilisateur</th>
+                <th style="text-align:left; padding:10px;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for upload in recent_uploads %}
+            <tr style="border-bottom: 1px solid #f0f0f0;">
+                <td style="padding:10px;">{{ upload.filename }}</td>
+                <td style="padding:10px;">{{ upload.created_at.strftime('%d/%m/%Y %H:%M') }}</td>
+                <td style="padding:10px;">{{ upload.user.username }}</td>
+                <td style="padding:10px;">
+                    <a href="{{ url_for('main.download', history_id=upload.id) }}" class="btn btn-primary" style="padding:5px 10px; font-size:12px;">⬇️ Télécharger</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color: #777; margin-top: 15px;">Aucun import pour le moment.</p>
+    {% endif %}
+</div>
+{% endblock %}
